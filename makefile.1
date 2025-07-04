@@ -1,0 +1,277 @@
+.\" Manpage for makefile
+.TH MAKEFILE 1 "2025-07-04" "Makefile Manual" "User Commands"
+.SH NAME
+makefile \- file containing build instructions for the \fBmake\fP utility
+.SH SYNOPSIS
+\fBmakefile\fP
+.SH DESCRIPTION
+A \fBmakefile\fP is a file used by the \fBmake\fP utility to automate the build process of software and other projects. It defines a set of rules, variables, and commands that describe how to derive target files from source files.
+
+.PP
+A \fBmakefile\fP consists mainly of \fBrules\fP. Each rule has the general format:
+
+.RS
+.nf
+target: prerequisites
+<TAB> command
+.fi
+.RE
+
+Here, \fItarget\fP is usually a file to be generated, \fIprerequisites\fP are files that the target depends on, and \fIcommand\fP is a shell command (or series of commands) to create or update the target.
+
+.PP
+When you invoke \fBmake\fP, it checks if targets are out of date relative to their prerequisites and executes the necessary commands.
+
+---
+
+.SH SECTIONS
+
+.SH RULES
+.PP
+Rules tell \fBmake\fP what files to build and how.
+
+.TP
+.B Targets
+A \fBtarget\fP is usually a file that \fBmake\fP should create or update. Targets can also be "phony" (not actual files).
+
+.TP
+.B Prerequisites
+Files that a target depends on. If any prerequisite is newer than the target, the commands will run.
+
+.TP
+.B Commands
+Shell commands to update the target. Must start with a tab character (\fITAB\fP).
+
+---
+
+.SH VARIABLES
+.PP
+Variables allow you to define reusable text, such as compiler flags or file lists.
+
+.TP
+.B Syntax
+Define variables with:
+
+.RS
+.nf
+VAR = value
+.fi
+.RE
+
+Use variables with:
+
+.RS
+.nf
+$(VAR) or ${VAR}
+.fi
+.RE
+
+.TP
+.B Common variables
+.IP
+\fBCC\fP — the C compiler (default: \fBgcc\fP)
+.IP
+\fBCFLAGS\fP — compiler flags (e.g., \fB-Wall -O2\fP)
+.IP
+\fBLDFLAGS\fP — linker flags
+.IP
+\fBCCFLAGS\fP and \fBLDFLAGS\fP can be customized to optimize or debug builds.
+
+---
+
+.SH AUTOMATIC VARIABLES
+.PP
+These variables are set by \fBmake\fP during rule execution:
+
+.TP
+.B $@
+The file name of the target of the rule.
+
+.TP
+.B $<
+The name of the first prerequisite.
+
+.TP
+.B $^
+The names of all the prerequisites, separated by spaces.
+
+---
+
+.SH PATTERN RULES
+.PP
+Pattern rules allow you to define generalized build instructions:
+
+.RS
+.nf
+%.o: %.c
+<TAB> $(CC) $(CFLAGS) -c $< -o $@
+.fi
+.RE
+
+This rule says: To make a \fB.o\fP file, compile the corresponding \fB.c\fP file.
+
+---
+
+.SH WILDCARDS
+.PP
+Wildcards let you match multiple files:
+
+.TP
+.B *
+Matches any string of characters.
+
+.TP
+.B ?
+Matches any single character.
+
+.TP
+.B [abc]
+Matches any one of the characters \fBa\fP, \fBb\fP, or \fBc\fP.
+
+Example:
+
+.RS
+.nf
+SRC = $(wildcard *.c)
+.fi
+.RE
+
+---
+
+.SH SPECIAL TARGETS
+.PP
+These targets have special meaning:
+
+.TP
+.B .PHONY
+Declare targets that do not correspond to actual files, to avoid conflicts.
+
+Example:
+
+.RS
+.nf
+.PHONY: clean all
+
+clean:
+<TAB> rm -f *.o program
+.fi
+.RE
+
+.TP
+.B .DEFAULT
+Command to run if no other rule matches.
+
+.TP
+.B .INTERMEDIATE
+Marks targets as intermediate files to be deleted after use.
+
+.TP
+.B .DELETE_ON_ERROR
+Deletes targets if a command fails during their creation.
+
+---
+
+.SH CONDITIONALS AND FUNCTIONS
+.PP
+You can write conditional statements:
+
+.RS
+.nf
+ifeq ($(CC),gcc)
+    CFLAGS += -O2
+endif
+.fi
+.RE
+
+.PP
+Common functions include:
+
+.TP
+.B $(wildcard pattern)
+Returns a list of files matching \fIpattern\fP.
+
+.TP
+.B $(shell command)
+Runs a shell command and returns its output.
+
+.TP
+.B $(filter pattern..., text)
+Filters words in \fBtext\fP matching \fIpattern\fP.
+
+---
+
+.SH INCLUDE DIRECTIVES
+.PP
+Makefiles can include other files with:
+
+.RS
+.nf
+include filename
+.fi
+.RE
+
+Useful for splitting large projects or sharing common settings.
+
+---
+
+.SH DEBUGGING
+.PP
+Run \fBmake\fP with:
+
+.TP
+.B -n
+Print commands without executing them.
+
+.TP
+.B -d
+Print verbose debug info.
+
+.TP
+.B --warn-undefined-variables
+Warn if a variable is used but undefined.
+
+---
+
+.SH PARALLEL BUILDS
+.PP
+Invoke \fBmake\fP with \fB-j N\fP to run jobs in parallel, where \fBN\fP is the number of jobs.
+
+Ensure your rules are safe for parallel builds by correctly specifying dependencies.
+
+---
+
+.SH EXAMPLES
+.PP
+Simple Makefile:
+
+.RS
+.nf
+CC = gcc
+CFLAGS = -Wall -O2
+
+all: program
+
+program: main.o utils.o
+<TAB> $(CC) $(CFLAGS) -o program main.o utils.o
+
+%.o: %.c
+<TAB> $(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+<TAB> rm -f *.o program
+.fi
+.RE
+
+---
+
+.SH SEE ALSO
+.BR make (1),
+.BR gcc (1),
+.BR automake (1),
+.BR makeinfo (1)
+
+---
+
+.SH AUTHOR
+Written by Adam Aarbouba.
+
