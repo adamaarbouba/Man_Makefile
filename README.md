@@ -1,4 +1,4 @@
-# Makefile Manpage Project Mostly Made By AI >> ChatGPT And Touched Up By Me
+# Makefile Manpage Project Mostly 
 
 This project is made by AdamAarbouba. It adds a simple, fully functional man page for `makefile` so you can use `man makefile` on your system.
 
@@ -15,3 +15,4 @@ man makefile                                      #4. Use it by running
 groff -T ascii -man makefile.1 | less             #5. Preview without installing
 
 
+Made By AI >> ChatGPT And Touched Up By Me
